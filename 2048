@@ -1,0 +1,180 @@
+"""
+Clone of 2048 game.
+"""
+
+import poc_2048_gui
+import random
+
+# Directions, DO NOT MODIFY
+UP = 1
+DOWN = 2
+LEFT = 3
+RIGHT = 4
+#grid_width=4
+#grid_height=4
+# Offsets for computing tile indices in each direction.
+# DO NOT MODIFY this dictionary.
+OFFSETS = {UP: (1, 0),
+           DOWN: (-1, 0),
+           LEFT: (0, 1),
+           RIGHT: (0, -1)}
+
+def merge(line):
+    """
+    Helper function that merges a single row or column in 2048
+    """
+    new=[]
+    lst=list(line)
+    for var in range(len(lst)-1):
+        if lst[var]==0:
+            pass
+        else:
+            for nex in range(1,len(lst)-var):
+                if lst[var+nex]==0 and (var+nex)!=(len(lst)-1):
+                    pass
+                elif lst[var+nex]!=lst[var]:
+                    new.append(lst[var])
+                    break
+                else:
+                    double=lst[var]+lst[var+nex]
+                    new.append(double)
+                    lst[var+nex]=0
+                    break
+    new.append(lst[len(lst)-1])
+    while len(new)<len(lst):
+        new.append(0)
+    return new
+
+class TwentyFortyEight:
+    """
+    Class to run the game logic.
+    """
+
+    def __init__(self, _grid_height, _grid_width):
+        self._grid_height=_grid_height
+        self._grid_width=_grid_width
+        self._initial = {UP:[(0, i) for i in range(self._grid_width)],
+                        DOWN:[(self._grid_height-1, i) for i in range(self._grid_width)],
+                        LEFT:[(i, 0) for i in range(self._grid_height)],
+                        RIGHT:[(i, self._grid_width-1) for i in range(self._grid_height)]}
+        self._grid=[]
+        self.reset()
+
+        
+    def reset(self):
+        """
+        Reset the game so the grid is empty except for two
+        initial tiles.
+        """
+        self._grid = [[0 for dummy_col in range(self._grid_width)]
+                           for dummy_row in range(self._grid_height)]
+        self.new_tile()
+        self.new_tile()
+        
+
+    def __str__(self):
+        """
+        Return the string of the grid.
+        """
+        return str(self._grid)
+
+    
+
+    def get_grid_height(self):
+        """
+        Return the height of the grid.
+        """
+        return self._grid_height
+
+    def get_grid_width(self):
+        """
+        Return the width of the grid.
+        """
+        return self._grid_width
+
+    def move(self, direction):
+        """
+        merge colums of rows according to the direction.
+        """
+        temp=[]
+        temp2=[]
+        tempgrid=str(self._grid)
+        if (direction == UP):
+            temp=[[self._grid[self._initial[UP][0][0] + dummy_j *OFFSETS[UP][0]][dummy_i] for dummy_j in range(self._grid_height)]
+                  for dummy_i in range(self._grid_width)]
+            for dummy_i in range(self._grid_width): 
+                temp2.append(merge(temp[dummy_i]))
+            for dummy_i in range(self._grid_width):
+                for dummy_j in range(self._grid_height):
+                    self._grid[dummy_j][dummy_i]=temp2[dummy_i][dummy_j]            
+        elif (direction == DOWN):
+            temp=[[self._grid[self._initial[DOWN][0][0] + dummy_j *OFFSETS[DOWN][0]][dummy_i] for dummy_j in range(self._grid_height)]
+                   for dummy_i in range(self._grid_width)]
+            for dummy_i in range(self._grid_width):
+                temp2.append(merge(temp[dummy_i]))
+            for dummy_i in range(self._grid_width):
+                for dummy_j in range(self._grid_height):
+                    self._grid[self._grid_height-1-dummy_j][dummy_i]=temp2[dummy_i][dummy_j]
+        elif (direction == LEFT):
+            temp=[[self._grid[dummy_j][self._initial[LEFT][0][1] + dummy_i *OFFSETS[LEFT][1]] for dummy_i in range(self._grid_width)]
+                   for dummy_j in range(self._grid_height)]
+            for dummy_j in range(self._grid_height):
+                temp2.append(merge(temp[dummy_j]))
+            for dummy_j in range(self._grid_height):
+                for dummy_i in range(self._grid_width):
+                    self._grid[dummy_j][dummy_i]=temp2[dummy_j][dummy_i] 
+                    
+        else:
+            temp=[[self._grid[dummy_j][self._initial[RIGHT][0][1] + dummy_i *OFFSETS[RIGHT][1]] for dummy_i in range(self._grid_width)]
+                   for dummy_j in range(self._grid_height)]
+            for dummy_j in range(self._grid_height):
+                temp2.append(merge(temp[dummy_j]))
+            for dummy_j in range(self._grid_height):
+                for dummy_i in range(self._grid_width):
+                    self._grid[dummy_j][self._grid_width-1-dummy_i]=temp2[dummy_j][dummy_i] 
+        if tempgrid==self.__str__():
+            pass
+        else:
+            self.new_tile()
+    def new_tile(self):
+        """
+        Create a new tile 2 or 4 in zero tile.
+        """
+        zero=[]
+        for dummy_i in range(self._grid_height):
+            for dummy_j in range(self._grid_width):
+                if self._grid[dummy_i][dummy_j]==0:
+                    zero.append((dummy_i,dummy_j))
+                else:
+                    pass
+        if len(zero)>0:  
+            rand=zero[random.randrange(len(zero))]
+            randnum=random.randrange(0,10)
+            if randnum>=9:
+                self._grid[rand[0]][rand[1]]=4
+            else:
+                self._grid[rand[0]][rand[1]]=2
+        else:
+            pass
+    def set_tile(self, row, col, value):
+        """
+        Set a value to a specific tile.
+        """
+        self._grid[row][col]=value
+        
+
+    def get_tile(self, row, col):
+        """
+        Get the value of a specific tile.
+        """
+        return self._grid[row][col]
+
+poc_2048_gui.run_gui(TwentyFortyEight(4, 4))
+
+
+
+
+
+
+
+
